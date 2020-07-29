@@ -2,19 +2,24 @@
   <div class="main-page">
     <div id="bg1" class="bg" :style="`background-image: url(${bgImg1})`"></div>
     <div id="bg2" class="bg" :style="`background-image: url(${bgImg2})`"></div>
-    <div class="content"></div>
+    <div class="content">
+      <div id="searchBox">
+        <SearchBox />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   import {getRandom} from "../utils";
-
+import SearchBox from "./SearchBox";
   export default {
     name: "MainPage",
+    components: {SearchBox},
     data() {
       const requireContext = require.context("../assets/bg", true);
       const images = requireContext.keys().map(requireContext);
-      console.log(images)
+      // console.log(images);
       return {
         bgImg1: "",
         bgImg2: "",
@@ -56,5 +61,13 @@
     min-width: 550px;
     position: absolute;
     z-index: 2;
+  }
+
+  #searchBox {
+    width: 90%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 150px;
   }
 </style>
