@@ -16,7 +16,7 @@
       <div id="searchBox">
         <SearchBox />
       </div>
-      <div class="cards" :style="cardsOpacity">
+      <div class="cards" :style="`opacity: ${fixCards ? 1 : 0}`">
         <a-row :gutter="[20, 40]">
           <a-col
             v-for="site in getSites"
@@ -26,6 +26,12 @@
             :md="24"
           >
             <Card :url="site.url" :imgPath="site.imgPath" :name="site.name" />
+          </a-col>
+          <a-col :xl="6" :lg="12" :md="24">
+            <div class="add-btn">
+              <div class="cross-v"></div>
+              <div class="cross-h"></div>
+            </div>
           </a-col>
         </a-row>
       </div>
@@ -53,7 +59,6 @@ export default {
       bgImg2: "",
       bgImgs,
       autoChangeTimer: null,
-      cardsOpacity: "",
       showingBg: 1,
       sites: [],
       defaultSites: [
@@ -116,7 +121,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("statusStore", ["autoUpdateBg"]),
+    ...mapState("statusStore", ["autoUpdateBg", "fixCards"]),
     getSites() {
       if (!this.sites || this.sites.length === 0) {
         return this.defaultSites;
@@ -135,7 +140,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("statusStore", ["setAutoUpdateBg"]),
+    ...mapMutations("statusStore", ["setAutoUpdateBg", "setFixCards"]),
     getBg() {
       console.log(111);
       if (!this.bgImg1 || !this.bgImg2) {
@@ -186,10 +191,10 @@ export default {
       }, 1000);
     },
     triggerFixCards() {
-      if (this.cardsOpacity) {
-        this.cardsOpacity = "";
+      if (this.fixCards) {
+        this.setFixCards(false);
       } else {
-        this.cardsOpacity = "opacity: 1";
+        this.setFixCards(true);
       }
     }
   },
@@ -262,5 +267,46 @@ export default {
 .cards:hover {
   transition: 0.5s opacity;
   opacity: 1;
+}
+
+.add-btn {
+  width: 200px;
+  height: 140px;
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 10px;
+  box-shadow: 0 0 2px rgba(200, 200, 200, 0.5);
+  opacity: 0;
+  transition: box-shadow 0.3s, opacity 0.3s;
+
+  .cross-v,
+  .cross-h {
+    box-shadow: 0 0 2px rgba(200, 200, 200, 0.5);
+    position: relative;
+  }
+  .cross-v {
+    height: 100px;
+    width: 0;
+    top: 20px;
+    left: calc(50% - 1px);
+    border-left: 1px solid #b5b5b5;
+  }
+  .cross-h {
+    width: 100px;
+    height: 0;
+    left: 50px;
+    top: -30px;
+    border-bottom: 1px solid #b5b5b5;
+  }
+}
+.add-btn:hover {
+  box-shadow: 0 0 10px rgba(200, 200, 200, 1);
+  opacity: 0.95;
+  transition: box-shadow 0.3s, opacity 0.3s;
+  .cross-v,
+  .cross-h {
+    box-shadow: 0 0 20px rgb(214, 214, 214);
+    transition: box-shadow 0.3s;
+  }
 }
 </style>
