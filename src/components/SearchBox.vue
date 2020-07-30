@@ -13,12 +13,12 @@
       @blur="handleBlur"
     >
       <span slot="addonBefore">
-        <a-dropdown @click="e => e.preventDefault()" class="dropdown">
+        <a-dropdown class="dropdown">
           <span>
             <img
               class="search-engine-icon"
-              src="../assets/searchEngineIcons/baidu.png"
-              :alt="'baidu'"
+              :src="searchEngine.icon"
+              alt="search engine"
             />
           </span>
           <a-menu
@@ -26,9 +26,13 @@
             @mouseover="handleOverMenu"
             @mouseout="handleOutMenu"
           >
-            <a-menu-item>Baidu</a-menu-item>
-            <a-menu-item>Google</a-menu-item>
-            <a-menu-item>Bing</a-menu-item>
+            <a-menu-item
+              v-for="engine of searchEngines"
+              :key="engine.name"
+              @click="handleMenuItemClick(engine)"
+            >
+              {{ engine.name }}
+            </a-menu-item>
           </a-menu>
         </a-dropdown>
       </span>
@@ -40,38 +44,45 @@
 export default {
   name: "SearchBox",
   data() {
+    const searchEngines = [
+      { name: "Baidu", icon: require("../assets/searchEngineIcons/baidu.png") },
+      {
+        name: "Google",
+        icon: require("../assets/searchEngineIcons/google.png")
+      },
+      { name: "Bing", icon: require("../assets/searchEngineIcons/bing.png") }
+    ];
+
     return {
       focus: false,
       over: false,
       overMenu: false,
-      searchEngine: "baidu",
-      styleClass: "hide"
+      searchEngine: searchEngines[0],
+      styleClass: "hide",
+      searchEngines
     };
   },
   methods: {
     handleSearch() {},
+    handleMenuItemClick(engine) {
+      this.searchEngine = engine;
+    },
     handleFocus() {
-      console.log(1);
       this.focus = true;
     },
     handleBlur() {
-      console.log(2);
       this.focus = false;
     },
     handleOver() {
-      console.log(3);
       this.over = true;
     },
     handleOut() {
-      console.log(4);
       this.over = false;
     },
     handleOverMenu() {
-      console.log(5);
       this.overMenu = true;
     },
     handleOutMenu() {
-      console.log(6);
       this.overMenu = false;
     }
   }
