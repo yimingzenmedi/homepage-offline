@@ -51,27 +51,27 @@ export default {
   methods: {
     handleSearch() {},
     handleFocus() {
-      console.log(1)
+      console.log(1);
       this.focus = true;
     },
     handleBlur() {
-      console.log(2)
+      console.log(2);
       this.focus = false;
     },
     handleOver() {
-      console.log(3)
+      console.log(3);
       this.over = true;
     },
     handleOut() {
-      console.log(4)
+      console.log(4);
       this.over = false;
     },
     handleOverMenu() {
-      console.log(5)
+      console.log(5);
       this.overMenu = true;
     },
     handleOutMenu() {
-      console.log(6)
+      console.log(6);
       this.overMenu = false;
     }
   }
