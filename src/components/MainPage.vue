@@ -158,7 +158,7 @@ export default {
   margin: 70px auto 5%;
   text-align: center;
   transition: 0.5s opacity;
-  /*opacity: 0;*/
+  opacity: 0;
 }
 .cards:hover {
   transition: 0.5s opacity;

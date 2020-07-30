@@ -1,8 +1,5 @@
 export default {
-  SEARCH_ENGINE_OPTIONS: {
-    BAIDU: {
-      text: "baidu",
-      icon: () => require("../assets/searchEngineIcons/baidu.png")
-    }
+  LOCAL_STORAGE_KEYS: {
+    SEARCH_ENGINE: "HOMEPAGE_SE"
   }
 };
