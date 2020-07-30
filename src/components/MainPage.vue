@@ -1,12 +1,22 @@
 <template>
   <div class="main-page">
-    <div id="bg1" class="bg" :style="`background-image: url(${bgImg1})`"></div>
-    <div id="bg2" class="bg" :style="`background-image: url(${bgImg2})`"></div>
+    <div id="bg1" class="bg" :style="bg1Style"></div>
+    <div id="bg2" class="bg" :style="bg2Style"></div>
+    <div class="hidden-buttons">
+      <a-icon type="reload" class="hidden-btn" @click="getBg" />
+      <a-icon type="pushpin" class="hidden-btn" @click="triggerFixCards" />
+      <a-icon
+        type="clock-circle"
+        class="hidden-btn"
+        @click="triggerAutoChange"
+        :spin="autoChangeTimer != null"
+      />
+    </div>
     <div class="content">
       <div id="searchBox">
         <SearchBox />
       </div>
-      <div class="cards">
+      <div class="cards" :style="cardsOpacity">
         <a-row :gutter="[20, 40]">
           <a-col
             v-for="site in getSites"
@@ -32,12 +42,17 @@ export default {
   components: { SearchBox, Card },
   data() {
     const requireContext = require.context("../assets/bg", true);
-    const bgImgs = requireContext.keys().map(requireContext);
-    // console.log(images);
+    const bgImgs = requireContext.keys();
+    // const bgIndex = getRandom(0, bgImgs.length - 1);
+    // const nextImg = require(`../assets/bg/${bgImgs[bgIndex].substring(2)}`);
+    // console.log(requireContext.keys());
+    // console.log(bgImgs);
     return {
       bgImg1: "",
       bgImg2: "",
       bgImgs,
+      autoChangeTimer: null,
+      cardsOpacity: "",
       showingBg: 1,
       sites: [],
       defaultSites: [
@@ -105,22 +120,80 @@ export default {
         return this.defaultSites;
       }
       return this.sites;
+    },
+    bg1Style() {
+      return `opacity: ${
+        this.showingBg === 1 ? 1 : 0
+      }; background-image: url("${this.bgImg1}")`;
+    },
+    bg2Style() {
+      return `opacity: ${
+        this.showingBg === 2 ? 1 : 0
+      }; background-image: url("${this.bgImg2}")`;
     }
   },
   methods: {
     getBg() {
-      const bgIndex = getRandom(0, this.bgImgs.length - 1);
-      if (this.showingBg === 1) {
-        this.bgImg1 = this.bgImgs[bgIndex];
-        this.showingBg = 2;
-      } else {
-        this.bgImg2 = this.bgImgs[bgIndex];
+      console.log(111);
+      if (!this.bgImg1 || !this.bgImg2) {
+        const bg1Index = getRandom(0, this.bgImgs.length - 1);
+        const bg2Index = getRandom(0, this.bgImgs.length - 1);
+        this.bgImg1 = require(`../assets/bg/${this.bgImgs[bg1Index].substring(
+          2
+        )}`);
+        this.bgImg2 = require(`../assets/bg/${this.bgImgs[bg2Index].substring(
+          2
+        )}`);
         this.showingBg = 1;
+      } else {
+        const bgIndex = getRandom(0, this.bgImgs.length - 1);
+        if (this.showingBg === 1) {
+          this.showingBg = 2;
+          setTimeout(() => {
+            this.bgImg1 = require(`../assets/bg/${this.bgImgs[
+              bgIndex
+            ].substring(2)}`);
+          }, 600);
+        } else {
+          this.showingBg = 1;
+          setTimeout(() => {
+            this.bgImg2 = require(`../assets/bg/${this.bgImgs[
+              bgIndex
+            ].substring(2)}`);
+          }, 600);
+        }
+      }
+    },
+    triggerAutoChange() {
+      if (this.autoChangeTimer) {
+        this.stopAutoChangeTimer();
+      } else {
+        this.startAutoChangeTimer();
+      }
+    },
+    stopAutoChangeTimer() {
+      window.clearInterval(this.autoChangeTimer);
+      this.autoChangeTimer = null;
+    },
+    startAutoChangeTimer() {
+      const _this = this;
+      this.autoChangeTimer = self.setInterval(() => {
+        _this.getBg();
+      }, 1000 * 60 * 5);
+    },
+    triggerFixCards() {
+      if (this.cardsOpacity) {
+        this.cardsOpacity = "";
+      } else {
+        this.cardsOpacity = "opacity: 1";
       }
     }
   },
   created() {
     this.getBg();
+  },
+  beforeMount() {
+    this.stopAutoChangeTimer();
   }
 };
 </script>
@@ -132,6 +205,7 @@ export default {
   height: 100%;
   background-size: cover;
   z-index: 1;
+  transition: opacity 1s;
 }
 .content {
   width: 80%;
@@ -150,6 +224,27 @@ export default {
   margin-right: auto;
   margin-top: 150px;
 }
+
+.hidden-buttons {
+  position: absolute;
+  z-index: 2;
+  height: 0;
+  font-size: 16px;
+  left: 5px;
+  top: 5px;
+  width: 20px;
+}
+
+.hidden-btn {
+  cursor: help !important;
+  color: rgba(133, 133, 133, 0);
+  transition: color 1s;
+}
+.hidden-btn:hover {
+  color: rgba(133, 133, 133, 0.95);
+  transition: color 1s;
+}
+
 .cards {
   padding-left: 2%;
   padding-right: 2%;
