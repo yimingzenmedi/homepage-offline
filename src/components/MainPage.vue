@@ -9,7 +9,7 @@
         type="clock-circle"
         class="hidden-btn"
         @click="triggerAutoChange"
-        :spin="autoChangeTimer != null"
+        :spin="autoUpdateBg"
       />
     </div>
     <div class="content">
@@ -37,6 +37,7 @@
 import { getRandom } from "../utils";
 import SearchBox from "./SearchBox";
 import Card from "./Card";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "MainPage",
   components: { SearchBox, Card },
@@ -115,6 +116,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("statusStore", ["autoUpdateBg"]),
     getSites() {
       if (!this.sites || this.sites.length === 0) {
         return this.defaultSites;
@@ -133,6 +135,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations("statusStore", ["setAutoUpdateBg"]),
     getBg() {
       console.log(111);
       if (!this.bgImg1 || !this.bgImg2) {
@@ -165,21 +168,22 @@ export default {
       }
     },
     triggerAutoChange() {
-      if (this.autoChangeTimer) {
+      if (this.autoUpdateBg) {
+        this.setAutoUpdateBg(false);
         this.stopAutoChangeTimer();
       } else {
+        this.setAutoUpdateBg(true);
         this.startAutoChangeTimer();
       }
     },
     stopAutoChangeTimer() {
       window.clearInterval(this.autoChangeTimer);
-      this.autoChangeTimer = null;
     },
     startAutoChangeTimer() {
       const _this = this;
       this.autoChangeTimer = self.setInterval(() => {
         _this.getBg();
-      }, 1000 * 60 * 5);
+      }, 1000);
     },
     triggerFixCards() {
       if (this.cardsOpacity) {

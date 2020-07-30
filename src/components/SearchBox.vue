@@ -43,20 +43,12 @@
 
 <script>
 import { getRandom } from "../utils";
+import { mapMutations, mapState } from "vuex";
 import config from "../config";
 
 export default {
   name: "SearchBox",
   data() {
-    const searchEngines = [
-      { name: "Baidu", icon: require("../assets/searchEngineIcons/baidu.png") },
-      {
-        name: "Google",
-        icon: require("../assets/searchEngineIcons/google.png")
-      },
-      { name: "Bing", icon: require("../assets/searchEngineIcons/bing.png") }
-    ];
-
     const placeholders = [
       " Search here ...",
       " What do u want to know ?",
@@ -66,18 +58,24 @@ export default {
       " Ask me anything ."
     ];
 
+    const searchEngines = config.SEARCH_ENGINES;
+
     return {
       focus: false,
       over: false,
       overMenu: false,
-      searchEngine: searchEngines[0],
+      // searchEngine: searchEngines[0],
       styleClass: "hide",
       searchEngines,
       placeholders,
       placeholder: ""
     };
   },
+  computed: {
+    ...mapState("statusStore", ["searchEngine"])
+  },
   methods: {
+    ...mapMutations("statusStore", ["setSearchEngine"]),
     getPlaceholder() {
       const index = getRandom(0, this.placeholders.length - 1);
       this.placeholder = this.placeholders[index];
@@ -100,11 +98,7 @@ export default {
       }
     },
     handleMenuItemClick(engine) {
-      this.searchEngine = engine;
-      localStorage.setItem(
-        config.LOCAL_STORAGE_KEYS.SEARCH_ENGINE,
-        engine.name
-      );
+      this.setSearchEngine(engine);
     },
     handleFocus() {
       this.focus = true;
@@ -127,15 +121,6 @@ export default {
   },
   created() {
     this.getPlaceholder();
-    const engineName = localStorage.getItem(
-      config.LOCAL_STORAGE_KEYS.SEARCH_ENGINE
-    );
-    for (const engine of this.searchEngines) {
-      if (engine.name === engineName) {
-        this.searchEngine = engine;
-        break;
-      }
-    }
   }
 };
 </script>
