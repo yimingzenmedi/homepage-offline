@@ -6,68 +6,82 @@
       <div id="searchBox">
         <SearchBox />
       </div>
+      <div class="cards">
+        <a-row :gutter="[16, 16]">
+          <a-col
+            v-for="user in searchedUsers"
+            :key="user.id"
+            :xl="8"
+            :lg="12"
+            :md="24"
+          >
+            <Card />
+          </a-col>
+        </a-row>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-  import {getRandom} from "../utils";
+import { getRandom } from "../utils";
 import SearchBox from "./SearchBox";
-  export default {
-    name: "MainPage",
-    components: {SearchBox},
-    data() {
-      const requireContext = require.context("../assets/bg", true);
-      const images = requireContext.keys().map(requireContext);
-      // console.log(images);
-      return {
-        bgImg1: "",
-        bgImg2: "",
-        images,
-        showingBg: 1
+import Card from "./Card";
+export default {
+  name: "MainPage",
+  components: { SearchBox, Card },
+  data() {
+    const requireContext = require.context("../assets/bg", true);
+    const images = requireContext.keys().map(requireContext);
+    // console.log(images);
+    return {
+      bgImg1: "",
+      bgImg2: "",
+      images,
+      showingBg: 1
+    };
+  },
+  methods: {
+    getBg() {
+      const bgIndex = getRandom(0, this.images.length - 1);
+      if (this.showingBg === 1) {
+        this.bgImg1 = this.images[bgIndex];
+        this.showingBg = 2;
+      } else {
+        this.bgImg2 = this.images[bgIndex];
+        this.showingBg = 1;
       }
-    },
-    methods: {
-      getBg() {
-        const bgIndex = getRandom(0, this.images.length - 1);
-        if (this.showingBg === 1) {
-          this.bgImg1 = this.images[bgIndex];
-          this.showingBg = 2;
-        } else {
-          this.bgImg2 = this.images[bgIndex];
-          this.showingBg = 1;
-        }
-      }
-    },
-    created() {
-      this.getBg();
     }
+  },
+  created() {
+    this.getBg();
   }
+};
 </script>
 
 <style scoped lang="less">
-  .bg {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    z-index: 1;
-  }
-  .content {
-    width: 80%;
-    background-color: rgba(255,255,235,0.4);
-    margin-left: 10%;
-    height: 100%;
-    min-width: 550px;
-    position: absolute;
-    z-index: 2;
-  }
+.bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  z-index: 1;
+}
+.content {
+  width: 80%;
+  background-color: rgba(255, 255, 235, 0.4);
+  margin-left: 10%;
+  height: 100%;
+  min-width: 550px;
+  position: absolute;
+  z-index: 2;
+}
 
-  #searchBox {
-    width: 90%;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 150px;
-  }
+#searchBox {
+  width: 90%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 150px;
+}
 </style>

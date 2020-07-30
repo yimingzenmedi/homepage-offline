@@ -1,21 +1,20 @@
 <template>
   <div id="app">
-    <MainPage/>
+    <MainPage />
   </div>
 </template>
 
 <script>
-import MainPage from './components/MainPage.vue'
+import MainPage from "./components/MainPage.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     MainPage
   }
-}
+};
 </script>
 
 <style>
-  @import "global.less";
-
+@import "global.less";
 </style>
