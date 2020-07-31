@@ -7,7 +7,7 @@ const statusStore = {
     searchEngine: "",
     autoUpdateBg: false,
     fixCards: false,
-    sites: [],
+    sites: []
   },
   mutations: {
     setSearchEngine: (state, searchEngine) => {

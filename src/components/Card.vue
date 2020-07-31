@@ -1,7 +1,9 @@
 <template>
   <div class="wrap">
     <div class="card" @click="handleClick">
-      <div :style="style" class="card-inner"></div>
+      <div :style="style" class="card-inner">
+        <div class="cover" v-if="showCover"></div>
+      </div>
       <div class="name">
         <span>{{ name }}</span>
       </div>
@@ -16,12 +18,17 @@
 export default {
   name: "Card",
   data() {
-    const { name, url, imgPath } = this.$attrs;
+    let { name, url, imgPath } = this.$attrs;
+    let showCover = false;
+    if (!imgPath.trim()) {
+      showCover = true;
+      imgPath = require("../assets/defaultImg/d_ag.png");
+    }
     const style = {
       backgroundImage: `url(${imgPath})`,
       backgroundSize: "cover"
     };
-    return { name, url, style };
+    return { name, url, style, showCover };
   },
   methods: {
     handleClick() {
@@ -39,6 +46,11 @@ export default {
 <style scoped lang="less">
 .wrap {
   text-align: center;
+}
+.cover {
+  width: 100%;
+  height: 100%;
+  /*background: rgba(255, 252, 50, 0.5);*/
 }
 .card {
   width: 200px;

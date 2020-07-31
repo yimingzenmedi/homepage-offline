@@ -64,5 +64,6 @@ export default {
       url: "https://mail.qq.com/",
       imgPath: require("../assets/defaultImg/qqmail.png")
     }
-  ]
+  ],
+  COVER_COLORS: ["rgba(255, 67, 77, 0.5)"]
 };
