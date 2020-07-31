@@ -7,14 +7,17 @@
       <div class="name">
         <span>{{ name }}</span>
       </div>
-      <div class="remove">
-        <span>x</span>
+      <div class="icons">
+        <a-icon type="edit" class="edit" @click.stop="handleEditCard" />
+        <a-icon type="close" class="remove" @click.stop="handleDeleteCard" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
+
 export default {
   name: "Card",
   data() {
@@ -30,7 +33,11 @@ export default {
     };
     return { name, url, style, showCover };
   },
+  computed: {
+    ...mapState("statusStore", ["sites"])
+  },
   methods: {
+    ...mapMutations("statusStore", ["setSites"]),
     handleClick() {
       const realUrl =
         this.url.substr(0, 7).toLowerCase() === "http://" ||
@@ -38,6 +45,29 @@ export default {
           ? this.url
           : "http://" + this.url;
       window.open(realUrl, "_blank");
+    },
+    handleEditCard() {
+      console.log("EDIT: ", this.name);
+    },
+    handleDeleteCard() {
+      console.log("DELETE: ", this.name);
+      this.$confirm({
+        title: `Remove ${this.name}?`,
+        okText: "Yes",
+        okType: "danger",
+        cancelText: "No",
+        onOk: () => {
+          const sites = [...this.sites];
+          for (const site of sites) {
+            if (site.name === this.name) {
+              const index = sites.indexOf(site);
+              sites.splice(index, 1);
+              break;
+            }
+          }
+          this.setSites(sites);
+        }
+      });
     }
   }
 };
@@ -77,23 +107,28 @@ export default {
     }
   }
 
-  .remove {
+  .icons {
     height: 0;
     position: relative;
     z-index: 10;
     left: 80px;
     top: -135px;
-    span {
+    .remove,
+    .edit {
       display: inline-block;
-      line-height: 1.3rem;
+      line-height: 1rem;
       vertical-align: middle;
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: rgba(80, 80, 80, 0.7);
       text-shadow: 0 0 1px rgba(250, 250, 250, 0.7);
+      margin-left: 3px;
+      margin-right: 3px;
     }
-    span:hover {
-      font-size: 1.2rem;
+    .remove:hover {
       color: #ff4648;
+    }
+    .edit:hover {
+      color: rgb(0, 86, 255);
     }
   }
   .card-inner {

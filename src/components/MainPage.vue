@@ -144,7 +144,6 @@ export default {
     resetSettings() {
       this.$confirm({
         title: "Reset everything?",
-        content: "Some descriptions",
         okText: "Yes",
         okType: "danger",
         cancelText: "No",
