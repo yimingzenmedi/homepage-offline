@@ -26,10 +26,16 @@
             :lg="12"
             :md="24"
           >
-            <Card :url="site.url" :imgPath="site.imgPath" :name="site.name" />
+            <Card
+              :url="site.url"
+              :imgPath="site.imgPath"
+              :name="site.name"
+              @editCard="editCard"
+              @deleteCard="deleteCard"
+            />
           </a-col>
           <a-col :xl="6" :lg="12" :md="24">
-            <div class="add-btn">
+            <div class="add-btn" @click="handleClickAdd">
               <div class="cross-v"></div>
               <div class="cross-h"></div>
             </div>
@@ -37,6 +43,69 @@
         </a-row>
       </div>
     </div>
+
+    <a-modal
+      :title="editingSite ? `Editing ${editingSite.name}` : 'Adding site'"
+      :visible="showModal"
+      @ok="handleModalOk"
+      @cancel="handleModalCancel"
+    >
+      <a-form :labelCol="{ span: 24 }" :wrapper-col="{ span: 24 }" :form="form">
+        <a-form-item label="Site name">
+          <a-input
+            placeholder="I'm essential and unique."
+            v-decorator="[
+              'name',
+              {
+                rules: [
+                  { required: true, message: 'I\'m essential.' },
+                  { validator: checkUnique }
+                ],
+                initialValue: editingSite ? editingSite.name : undefined
+              }
+            ]"
+          />
+        </a-form-item>
+        <a-form-item label="URL">
+          <a-input
+            placeholder="It will be meaningless without me."
+            v-decorator="[
+              'url',
+              {
+                rules: [{ required: true, message: 'That\'s meaningless.' }],
+                initialValue: editingSite ? editingSite.url : undefined
+              }
+            ]"
+          />
+        </a-form-item>
+        <a-form-item label="Image">
+          <a-upload
+            list-type="picture-card"
+            :show-upload-list="false"
+            :before-upload="tempSave"
+            v-decorator="[
+              'img',
+              {
+                rules: [{ validator: checkSize }]
+              }
+            ]"
+          >
+            <img
+              v-if="tempFile"
+              :src="tempFile"
+              alt="upload"
+              class="uploaded-img"
+            />
+            <div v-else>
+              <a-icon type="plus" />
+              <div class="ant-upload-text">
+                I love beauty.
+              </div>
+            </div>
+          </a-upload>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -45,6 +114,12 @@ import { getRandom, saveLocalStorage } from "../utils";
 import SearchBox from "./SearchBox";
 import Card from "./Card";
 import { mapMutations, mapState } from "vuex";
+
+function getBase64(img, callback) {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+}
 
 export default {
   name: "MainPage",
@@ -58,7 +133,11 @@ export default {
       bgImg2: "",
       bgImgs,
       autoChangeTimer: null,
-      showingBg: 1
+      tempFile: null,
+      showingBg: 1,
+      editingSite: null,
+      showModal: false,
+      form: this.$form.createForm(this, { name: "editSiteForm" })
     };
   },
   computed: {
@@ -84,7 +163,8 @@ export default {
     ...mapMutations("statusStore", [
       "setAutoUpdateBg",
       "setFixCards",
-      "initLocalStorage"
+      "initLocalStorage",
+      "setSites"
     ]),
     getBg() {
       if (!this.bgImg1 || !this.bgImg2) {
@@ -115,6 +195,35 @@ export default {
           }, 600);
         }
       }
+    },
+    checkUnique(rule, value, callback) {
+      for (const site of this.sites) {
+        if (site.name.toLowerCase() === value.trim().toLowerCase()) {
+          return callback("I'm unique.");
+        }
+      }
+      callback();
+    },
+    checkSize(rule, value, callback) {
+      console.log(this.file.size / 1024);
+      if (this.file.size / 1024 > 200) {
+        return callback("I refuse. It's too big.");
+      }
+      callback();
+    },
+    tempSave(file) {
+      // console.log(file.size / 1024)
+      // if (file.size / 1024 > 200) {
+      //   this.$message.error("It's too big.");
+      //   return false;
+      // }
+      getBase64(file, base64 => {
+        console.log(base64);
+        this.tempFile = base64;
+      });
+      console.log(file);
+      console.log(this.tempFile);
+      return false;
     },
     triggerAutoChange() {
       if (this.autoUpdateBg) {
@@ -152,6 +261,55 @@ export default {
           this.initLocalStorage();
         }
       });
+    },
+    editCard(name) {
+      console.log("EDIT: ", name);
+      for (const site of this.sites) {
+        if (site.name === name) {
+          this.editingSite = site;
+        }
+      }
+    },
+    deleteCard(name) {
+      this.$confirm({
+        title: `Remove ${name}?`,
+        okText: "Yes",
+        okType: "danger",
+        cancelText: "No",
+        onOk: () => {
+          const sites = [...this.sites];
+          for (const site of sites) {
+            if (site.name === name) {
+              const index = sites.indexOf(site);
+              sites.splice(index, 1);
+              break;
+            }
+          }
+          this.setSites(sites);
+        }
+      });
+    },
+    handleClickAdd() {
+      this.showModal = true;
+    },
+    handleClickEdit(name) {
+      return name;
+    },
+    handleModalOk() {
+      this.form.validateFields((error, values) => {
+        if (error) {
+          console.log("error");
+          return;
+        }
+        console.log(values);
+        // todo
+      });
+    },
+    handleModalCancel() {
+      this.editingSite = null;
+      this.form.resetFields();
+      this.showModal = false;
+      this.tempFile = null;
     }
   },
   created() {
@@ -264,5 +422,13 @@ export default {
     box-shadow: 0 0 20px rgb(214, 214, 214);
     transition: box-shadow 0.3s;
   }
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
+.uploaded-img {
+  max-width: 450px;
 }
 </style>

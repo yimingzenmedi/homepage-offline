@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 
 export default {
   name: "Card",
@@ -37,7 +37,6 @@ export default {
     ...mapState("statusStore", ["sites"])
   },
   methods: {
-    ...mapMutations("statusStore", ["setSites"]),
     handleClick() {
       const realUrl =
         this.url.substr(0, 7).toLowerCase() === "http://" ||
@@ -47,27 +46,10 @@ export default {
       window.open(realUrl, "_blank");
     },
     handleEditCard() {
-      console.log("EDIT: ", this.name);
+      this.$emit("editCard", this.name);
     },
     handleDeleteCard() {
-      console.log("DELETE: ", this.name);
-      this.$confirm({
-        title: `Remove ${this.name}?`,
-        okText: "Yes",
-        okType: "danger",
-        cancelText: "No",
-        onOk: () => {
-          const sites = [...this.sites];
-          for (const site of sites) {
-            if (site.name === this.name) {
-              const index = sites.indexOf(site);
-              sites.splice(index, 1);
-              break;
-            }
-          }
-          this.setSites(sites);
-        }
-      });
+      this.$emit("deleteCard", this.name);
     }
   }
 };
