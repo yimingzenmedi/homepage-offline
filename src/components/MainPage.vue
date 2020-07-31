@@ -16,7 +16,7 @@
       <div id="searchBox">
         <SearchBox />
       </div>
-      <div class="cards" :style="`opacity: ${fixCards ? 1 : 0}`">
+      <div class="cards" :style="fixCards ? 'opacity: 1' : ''">
         <a-row :gutter="[20, 40]">
           <a-col
             v-for="site in getSites"
@@ -50,78 +50,17 @@ export default {
   data() {
     const requireContext = require.context("../assets/bg", true);
     const bgImgs = requireContext.keys();
-    // const bgIndex = getRandom(0, bgImgs.length - 1);
-    // const nextImg = require(`../assets/bg/${bgImgs[bgIndex].substring(2)}`);
-    // console.log(requireContext.keys());
-    // console.log(bgImgs);
+
     return {
       bgImg1: "",
       bgImg2: "",
       bgImgs,
       autoChangeTimer: null,
-      showingBg: 1,
-      sites: [],
-      defaultSites: [
-        {
-          name: "Youtube",
-          url: "https://www.youtube.com",
-          imgPath: require("../assets/defaultImg/youtube.png")
-        },
-        {
-          name: "Bilibili",
-          url: "https://www.bilibili.com/",
-          imgPath: require("../assets/defaultImg/bilibili.png")
-        },
-        {
-          name: "Gmail",
-          url: "https://mail.google.com",
-          imgPath: require("../assets/defaultImg/gmail.png")
-        },
-        {
-          name: "Google docs",
-          url: "https://www.google.com/intl/zh-CN/docs/about/",
-          imgPath: require("../assets/defaultImg/googledocs.png")
-        },
-        {
-          name: "Github",
-          url: "https://github.com/",
-          imgPath: require("../assets/defaultImg/github.png")
-        },
-        {
-          name: "JD.com",
-          url: "https://www.jd.com/",
-          imgPath: require("../assets/defaultImg/jdcom.png")
-        },
-        {
-          name: "TradeMe",
-          url: "https://www.trademe.co.nz/",
-          imgPath: require("../assets/defaultImg/trademe.png")
-        },
-        {
-          name: "Facebook",
-          url: "https://www.facebook.com/",
-          imgPath: require("../assets/defaultImg/facebook.png")
-        },
-        {
-          name: "Twitter",
-          url: "https://twitter.com/",
-          imgPath: require("../assets/defaultImg/twitter.png")
-        },
-        {
-          name: "Instagram",
-          url: "https://www.instagram.com/",
-          imgPath: require("../assets/defaultImg/instagram.png")
-        },
-        {
-          name: "QQ mail",
-          url: "https://mail.qq.com/",
-          imgPath: require("../assets/defaultImg/qqmail.png")
-        }
-      ]
+      showingBg: 1
     };
   },
   computed: {
-    ...mapState("statusStore", ["autoUpdateBg", "fixCards"]),
+    ...mapState("statusStore", ["autoUpdateBg", "fixCards", "sites"]),
     getSites() {
       if (!this.sites || this.sites.length === 0) {
         return this.defaultSites;
@@ -142,7 +81,6 @@ export default {
   methods: {
     ...mapMutations("statusStore", ["setAutoUpdateBg", "setFixCards"]),
     getBg() {
-      console.log(111);
       if (!this.bgImg1 || !this.bgImg2) {
         const bg1Index = getRandom(0, this.bgImgs.length - 1);
         const bg2Index = getRandom(0, this.bgImgs.length - 1);
@@ -274,7 +212,7 @@ export default {
   height: 140px;
   cursor: pointer;
   display: inline-block;
-  border-radius: 10px;
+  border-radius: 15px;
   box-shadow: 0 0 2px rgba(200, 200, 200, 0.5);
   opacity: 0;
   transition: box-shadow 0.3s, opacity 0.3s;

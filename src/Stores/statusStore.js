@@ -6,7 +6,8 @@ const statusStore = {
   state: {
     searchEngine: "",
     autoUpdateBg: false,
-    fixCards: false
+    fixCards: false,
+    sites: [],
   },
   mutations: {
     setSearchEngine: (state, searchEngine) => {
@@ -27,12 +28,14 @@ const statusStore = {
         savedInfo = {};
       }
       console.log("Saved info: ", savedInfo);
-      const { searchEngine, autoUpdateBg, fixCards } = savedInfo;
+      const { searchEngine, autoUpdateBg, fixCards, sites } = savedInfo;
       state.searchEngine = searchEngine
         ? searchEngine
         : config.SEARCH_ENGINES[0];
       state.autoUpdateBg = autoUpdateBg == null ? false : autoUpdateBg;
       state.fixCards = fixCards == null ? false : fixCards;
+      state.sites = sites ? sites : config.DEFAULT_SITES;
+      saveLocalStorage(state);
     }
   }
 };
