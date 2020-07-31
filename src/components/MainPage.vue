@@ -11,6 +11,7 @@
         @click="triggerAutoChange"
         :spin="autoUpdateBg"
       />
+      <a-icon type="close-circle" class="hidden-btn" @click="resetSettings" />
     </div>
     <div class="content">
       <div id="searchBox">
@@ -40,10 +41,11 @@
 </template>
 
 <script>
-import { getRandom } from "../utils";
+import { getRandom, saveLocalStorage } from "../utils";
 import SearchBox from "./SearchBox";
 import Card from "./Card";
 import { mapMutations, mapState } from "vuex";
+
 export default {
   name: "MainPage",
   components: { SearchBox, Card },
@@ -79,7 +81,11 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("statusStore", ["setAutoUpdateBg", "setFixCards"]),
+    ...mapMutations("statusStore", [
+      "setAutoUpdateBg",
+      "setFixCards",
+      "initLocalStorage"
+    ]),
     getBg() {
       if (!this.bgImg1 || !this.bgImg2) {
         const bg1Index = getRandom(0, this.bgImgs.length - 1);
@@ -134,6 +140,19 @@ export default {
       } else {
         this.setFixCards(true);
       }
+    },
+    resetSettings() {
+      this.$confirm({
+        title: "Reset everything?",
+        content: "Some descriptions",
+        okText: "Yes",
+        okType: "danger",
+        cancelText: "No",
+        onOk: () => {
+          saveLocalStorage(null);
+          this.initLocalStorage();
+        }
+      });
     }
   },
   created() {

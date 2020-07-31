@@ -22,6 +22,10 @@ const statusStore = {
       state.fixCards = fixCards;
       saveLocalStorage(state);
     },
+    setSites: (state, sites) => {
+      state.sites = sites;
+      saveLocalStorage(state);
+    },
     initLocalStorage: state => {
       let savedInfo = loadLocalStorage();
       if (savedInfo == null) {
