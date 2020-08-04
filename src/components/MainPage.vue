@@ -92,16 +92,34 @@
             :before-upload="tempSave"
             v-decorator="['imgPath', { rules: [{ validator: checkSize }] }]"
           >
-            <img
+            <div
               v-if="
-                tempFile64 ? tempFile64 : editingSite && editingSite.imgPath
+                tempFile64
+                  ? tempFile64
+                  : tempFile64 !== '' && editingSite && editingSite.imgPath
               "
-              :src="
-                tempFile64 ? tempFile64 : editingSite ? editingSite.imgPath : ''
-              "
-              alt="avatar"
-              class="uploaded-img"
-            />
+            >
+              <img
+                :src="
+                  tempFile64
+                    ? tempFile64
+                    : editingSite
+                    ? editingSite.imgPath
+                    : ''
+                "
+                alt="avatar"
+                class="uploaded-img"
+              />
+              <span class="remove-img" @click.stop="removeBgImg">
+                <a-icon
+                  class="remove-img-icon"
+                  style="font-size: 15px"
+                  type="delete"
+                />
+                Remove
+              </span>
+            </div>
+
             <div v-else>
               <a-icon type="plus" />
               <div class="ant-upload-text">
@@ -176,6 +194,10 @@ export default {
       "initLocalStorage",
       "setSites"
     ]),
+    removeBgImg() {
+      this.tempFile64 = "";
+      this.tempFile = null;
+    },
     getBg() {
       if (!this.bgImg1 || !this.bgImg2) {
         const bg1Index = getRandom(0, this.bgImgs.length - 1);
@@ -494,6 +516,16 @@ export default {
 }
 .uploaded-img {
   max-width: 450px;
+}
+
+.remove-img {
+  font-size: 15px;
+}
+.remove-img:hover {
+  color: red !important;
+  .remove-img-icon {
+    color: red !important;
+  }
 }
 
 .image-uploader > .ant-upload {
