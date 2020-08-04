@@ -16,8 +16,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "Card",
   data() {
@@ -32,9 +30,6 @@ export default {
       backgroundSize: "cover"
     };
     return { name, url, style, showCover };
-  },
-  computed: {
-    ...mapState("statusStore", ["sites"])
   },
   methods: {
     handleClick() {
@@ -98,19 +93,21 @@ export default {
     .remove,
     .edit {
       display: inline-block;
-      line-height: 1rem;
+      line-height: 1.3rem;
       vertical-align: middle;
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: rgba(80, 80, 80, 0.7);
+      margin-right: 6px;
       text-shadow: 0 0 1px rgba(250, 250, 250, 0.7);
-      margin-left: 3px;
-      margin-right: 3px;
+    }
+    span:hover {
+      font-size: 1.2rem;
     }
     .remove:hover {
       color: #ff4648;
     }
     .edit:hover {
-      color: rgb(0, 86, 255);
+      color: rgb(25, 127, 255);
     }
   }
   .card-inner {

@@ -17,7 +17,10 @@
       <div id="searchBox">
         <SearchBox />
       </div>
-      <div class="cards" :style="fixCards ? 'opacity: 1' : ''">
+      <div
+        class="cards"
+        :style="tempFix ? 'opacity: 1' : fixCards ? 'opacity: 1' : ''"
+      >
         <a-row :gutter="[20, 40]">
           <a-col
             v-for="site in getSites"
@@ -32,6 +35,7 @@
               :name="site.name"
               @editCard="editCard"
               @deleteCard="deleteCard"
+              :class="deletingSite === site.name ? 'shake shake-constant' : ''"
             />
           </a-col>
           <a-col :xl="6" :lg="12" :md="24">
@@ -132,10 +136,12 @@ export default {
       bgImg1: "",
       bgImg2: "",
       bgImgs,
+      tempFix: false,
       autoChangeTimer: null,
       tempFile: null,
       showingBg: 1,
       editingSite: null,
+      deletingSite: "",
       showModal: false,
       form: this.$form.createForm(this, { name: "editSiteForm" })
     };
@@ -253,6 +259,7 @@ export default {
     resetSettings() {
       this.$confirm({
         title: "Reset everything?",
+        content: "Some descriptions",
         okText: "Yes",
         okType: "danger",
         cancelText: "No",
@@ -271,6 +278,8 @@ export default {
       }
     },
     deleteCard(name) {
+      this.deletingSite = name;
+      this.tempFix = true;
       this.$confirm({
         title: `Remove ${name}?`,
         okText: "Yes",
@@ -286,6 +295,12 @@ export default {
             }
           }
           this.setSites(sites);
+          this.deletingSite = "";
+          this.tempFix = false;
+        },
+        onCancel: () => {
+          this.deletingSite = "";
+          this.tempFix = false;
         }
       });
     },
