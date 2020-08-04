@@ -47,7 +47,6 @@
         </a-row>
       </div>
     </div>
-
     <a-modal
       :title="editingSite ? `Editing ${editingSite.name}` : 'Adding site'"
       :visible="showModal"
@@ -69,44 +68,6 @@
               }
             ]"
           />
-        </a-form-item>
-        <a-form-item label="URL">
-          <a-input
-            placeholder="It will be meaningless without me."
-            v-decorator="[
-              'url',
-              {
-                rules: [{ required: true, message: 'That\'s meaningless.' }],
-                initialValue: editingSite ? editingSite.url : undefined
-              }
-            ]"
-          />
-        </a-form-item>
-        <a-form-item label="Image">
-          <a-upload
-            list-type="picture-card"
-            :show-upload-list="false"
-            :before-upload="tempSave"
-            v-decorator="[
-              'img',
-              {
-                rules: [{ validator: checkSize }]
-              }
-            ]"
-          >
-            <img
-              v-if="tempFile"
-              :src="tempFile"
-              alt="upload"
-              class="uploaded-img"
-            />
-            <div v-else>
-              <a-icon type="plus" />
-              <div class="ant-upload-text">
-                I love beauty.
-              </div>
-            </div>
-          </a-upload>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -202,13 +163,30 @@ export default {
         }
       }
     },
-    checkUnique(rule, value, callback) {
+    checkKeyLength(rule, value, callback) {
+      // console.log("Check!", !value.trim())
+
+      // if (value && value.toString().length > 8) {
+      //   callback();
+      // } else {
+      //   callback("Application key must longer than 9");
+      // }
       for (const site of this.sites) {
         if (site.name.toLowerCase() === value.trim().toLowerCase()) {
           return callback("I'm unique.");
         }
       }
       callback();
+    },
+    async checkUnique(rule, value, callback) {
+      if (value && value.trim()) {
+        for (const site of this.sites) {
+          if (site.name.toLowerCase() === value.trim().toLowerCase()) {
+            return callback("I'm unique.");
+          }
+        }
+        callback();
+      }
     },
     checkSize(rule, value, callback) {
       console.log(this.file.size / 1024);
@@ -270,10 +248,10 @@ export default {
       });
     },
     editCard(name) {
-      console.log("EDIT: ", name);
       for (const site of this.sites) {
         if (site.name === name) {
           this.editingSite = site;
+          this.showModal = true;
         }
       }
     },
@@ -311,13 +289,16 @@ export default {
       return name;
     },
     handleModalOk() {
-      this.form.validateFields((error, values) => {
+      this.form.validateFields(async (error, values) => {
         if (error) {
-          console.log("error");
+          console.log(values);
           return;
         }
-        console.log(values);
-        // todo
+        //   if (error) {
+        //     console.log("error");
+        //     return;
+        //   }
+        //   console.log(values);
       });
     },
     handleModalCancel() {
