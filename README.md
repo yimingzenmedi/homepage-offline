@@ -1,5 +1,14 @@
 # homepage
 
+## Update info
+
+- v1.2.0
+    * Rewrite the page using vue-cli.
+    * Can automatically change background image.
+    * Can upload site background image and save to localhost.
+    * Can save settings and reset settings.
+    * Adjust some layouts.
+
 ## Project setup
 ```
 npm install
@@ -20,5 +29,3 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
