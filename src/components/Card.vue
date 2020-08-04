@@ -21,13 +21,14 @@ export default {
   data() {
     let { name, url, imgPath } = this.$attrs;
     let showCover = false;
-    if (!imgPath.trim()) {
+    if (!imgPath || !imgPath.trim()) {
       showCover = true;
       imgPath = require("../assets/defaultImg/d_ag.png");
     }
     const style = {
       backgroundImage: `url(${imgPath})`,
-      backgroundSize: "cover"
+      backgroundSize: "cover",
+      backgroundPosition: "center"
     };
     return { name, url, style, showCover };
   },

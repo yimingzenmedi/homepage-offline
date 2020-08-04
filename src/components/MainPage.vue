@@ -13,6 +13,7 @@
       />
       <a-icon type="close-circle" class="hidden-btn" @click="resetSettings" />
     </div>
+    <div class="content-wrap"></div>
     <div class="content">
       <div id="searchBox">
         <SearchBox />
@@ -24,7 +25,7 @@
         <a-row :gutter="[20, 40]">
           <a-col
             v-for="site in getSites"
-            :key="site.name"
+            :key="site.name + site.editTime ? site.editTime : ''"
             :xl="6"
             :lg="12"
             :md="24"
@@ -81,6 +82,34 @@
             ]"
           />
         </a-form-item>
+        <a-form-item label="Background image">
+          <a-upload
+            name="Background image"
+            list-type="picture-card"
+            class="image-uploader"
+            :show-upload-list="false"
+            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            :before-upload="tempSave"
+            v-decorator="['imgPath', { rules: [{ validator: checkSize }] }]"
+          >
+            <img
+              v-if="
+                tempFile64 ? tempFile64 : editingSite && editingSite.imgPath
+              "
+              :src="
+                tempFile64 ? tempFile64 : editingSite ? editingSite.imgPath : ''
+              "
+              alt="avatar"
+              class="uploaded-img"
+            />
+            <div v-else>
+              <a-icon type="plus" />
+              <div class="ant-upload-text">
+                I love beauty.
+              </div>
+            </div>
+          </a-upload>
+        </a-form-item>
       </a-form>
     </a-modal>
   </div>
@@ -111,12 +140,14 @@ export default {
       bgImgs,
       tempFix: false,
       autoChangeTimer: null,
+      tempFile64: null,
       tempFile: null,
       showingBg: 1,
       editingSite: null,
       deletingSite: "",
       showModal: false,
-      form: this.$form.createForm(this, { name: "editSiteForm" })
+      form: this.$form.createForm(this, { name: "editSiteForm" }),
+      isAdding: false
     };
   },
   computed: {
@@ -175,23 +206,14 @@ export default {
         }
       }
     },
-    checkKeyLength(rule, value, callback) {
-      // console.log("Check!", !value.trim())
-
-      // if (value && value.toString().length > 8) {
-      //   callback();
-      // } else {
-      //   callback("Application key must longer than 9");
-      // }
-      for (const site of this.sites) {
-        if (site.name.toLowerCase() === value.trim().toLowerCase()) {
-          return callback("I'm unique.");
-        }
-      }
-      callback();
-    },
     async checkUnique(rule, value, callback) {
-      if (value && value.trim()) {
+      if (
+        this.isAdding &&
+        value &&
+        value.trim() &&
+        this.sites &&
+        this.sites.length > 0
+      ) {
         for (const site of this.sites) {
           if (site.name.toLowerCase() === value.trim().toLowerCase()) {
             return callback("I'm unique.");
@@ -200,25 +222,20 @@ export default {
         callback();
       }
     },
-    checkSize(rule, value, callback) {
-      console.log(this.file.size / 1024);
-      if (this.file.size / 1024 > 200) {
-        return callback("I refuse. It's too big.");
+    async checkSize(rule, value, callback) {
+      if (this.tempFile && this.tempFile.size / 1024 > 150) {
+        return callback("I refuse. Too big. Should be smaller than 150kb.");
       }
       callback();
     },
     tempSave(file) {
-      // console.log(file.size / 1024)
-      // if (file.size / 1024 > 200) {
-      //   this.$message.error("It's too big.");
-      //   return false;
-      // }
+      this.tempFile = file;
       getBase64(file, base64 => {
         console.log(base64);
-        this.tempFile = base64;
+        this.tempFile64 = base64;
       });
       console.log(file);
-      console.log(this.tempFile);
+      console.log(this.tempFile64);
       return false;
     },
     triggerAutoChange() {
@@ -295,28 +312,59 @@ export default {
       });
     },
     handleClickAdd() {
+      this.isAdding = true;
       this.showModal = true;
     },
-    handleClickEdit(name) {
-      return name;
-    },
     handleModalOk() {
+      console.log("Submit");
       this.form.validateFields(async (error, values) => {
+        console.log("Checking...");
         if (error) {
+          console.log("Have error: ");
           console.log(values);
           return;
         }
-        //   if (error) {
-        //     console.log("error");
-        //     return;
-        //   }
-        //   console.log(values);
+        console.log(values);
+        // const itemObj = {
+        //   name: values.name
+        // };
+        console.log("No error :p");
+        let newSites = [...this.sites];
+        if (this.isAdding) {
+          newSites.push({
+            name: values.name,
+            url: values.url,
+            imgPath: this.tempFile64,
+            editTime: new Date().getTime()
+          });
+        } else {
+          for (const index in newSites) {
+            const site = newSites[index];
+            if (site.name === this.editingSite.name) {
+              newSites[index] = {
+                name: values.name,
+                url: values.url,
+                imgPath:
+                  this.tempFile64 || this.tempFile64 === ""
+                    ? this.tempFile64
+                    : site.imgPath,
+                editTime: new Date().getTime()
+              };
+              break;
+            }
+          }
+        }
+        console.log(newSites);
+        this.setSites(newSites);
+        this.handleModalCancel();
       });
     },
     handleModalCancel() {
       this.editingSite = null;
+      this.isAdding = false;
       this.form.resetFields();
       this.showModal = false;
+      this.tempFile64 = null;
       this.tempFile = null;
     }
   },
@@ -338,11 +386,19 @@ export default {
   z-index: 1;
   transition: opacity 1s;
 }
-.content {
+.content-wrap {
   width: 80%;
   background-color: rgba(255, 255, 235, 0.4);
   margin-left: 10%;
   height: 100%;
+  min-width: 550px;
+  position: fixed;
+  z-index: 2;
+}
+
+.content {
+  width: 80%;
+  margin-left: 10%;
   min-width: 550px;
   position: absolute;
   z-index: 2;
@@ -438,5 +494,14 @@ export default {
 }
 .uploaded-img {
   max-width: 450px;
+}
+
+.image-uploader > .ant-upload {
+  width: 128px;
+  height: 128px;
+}
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
 }
 </style>
