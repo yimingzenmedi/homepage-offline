@@ -69,6 +69,18 @@
             ]"
           />
         </a-form-item>
+        <a-form-item label="URL">
+          <a-input
+            placeholder="It's meaningless without me."
+            v-decorator="[
+              'url',
+              {
+                rules: [{ required: true, message: 'It\'s meaningless.' }],
+                initialValue: editingSite ? editingSite.url : undefined
+              }
+            ]"
+          />
+        </a-form-item>
       </a-form>
     </a-modal>
   </div>
