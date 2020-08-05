@@ -276,7 +276,7 @@ export default {
       const _this = this;
       this.autoChangeTimer = self.setInterval(() => {
         _this.getBg();
-      }, 1000);
+      }, 1000 * 60 * 5);
     },
     triggerFixCards() {
       if (this.fixCards) {
