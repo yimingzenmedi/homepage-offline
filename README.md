@@ -2,6 +2,9 @@
 
 ## Update info
 
+- v1.2.1
+    * Optimize changing cards opacity. 
+
 - v1.2.0
     * Rewrite the page using vue-cli.
     * Can automatically change background image.

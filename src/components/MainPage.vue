@@ -463,6 +463,7 @@ export default {
   text-align: center;
   transition: 0.5s opacity;
   opacity: 0;
+  will-change: opacity;
 }
 .cards:hover {
   transition: 0.5s opacity;
