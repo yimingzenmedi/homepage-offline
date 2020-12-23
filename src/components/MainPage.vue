@@ -28,7 +28,7 @@
             :key="site.name + site.editTime ? site.editTime : ''"
             :xl="6"
             :lg="12"
-            :md="24"
+            :md="12"
           >
             <Card
               :url="site.url"
@@ -39,7 +39,7 @@
               :class="deletingSite === site.name ? 'shake shake-constant' : ''"
             />
           </a-col>
-          <a-col :xl="6" :lg="12" :md="24">
+          <a-col :xl="6" :lg="12" :md="12">
             <div class="add-btn" @click="handleClickAdd">
               <div class="cross-v"></div>
               <div class="cross-h"></div>
